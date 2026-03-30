@@ -24,6 +24,10 @@ let currentSettings = null;
 let audioCtx = null;
 let milestones = [];
 let milestoneTriggered = new Set();
+let audioFiles = {};
+let useFiles = false;
+let masterVolume = 0.8;
+let muted = false;
 
 function startGame(){
   resetGame(true);
@@ -42,6 +46,9 @@ function startGame(){
   milestones.push({score: half, message: 'Halfway there!'});
   if(threeQ !== half) milestones.push({score: threeQ, message: 'Great progress!'});
   if(almost !== threeQ && almost !== half) milestones.push({score: almost, message: 'Almost there!'});
+
+  // try to load audio file elements once per new game start
+  maybeLoadAudioFiles();
 
   spawnTimer = setInterval(spawnDrop, currentSettings.spawnInterval);
   clockTimer = setInterval(()=>{
@@ -134,7 +141,7 @@ function playTone(freq, duration=0.12, type='sine', gain=0.12){
     const o = audioCtx.createOscillator();
     const g = audioCtx.createGain();
     o.type = type; o.frequency.setValueAtTime(freq, t);
-    g.gain.setValueAtTime(gain, t);
+    g.gain.setValueAtTime(gain * (muted?0:masterVolume), t);
     g.gain.exponentialRampToValueAtTime(0.0001, t + duration);
     o.connect(g); g.connect(audioCtx.destination);
     o.start(t); o.stop(t + duration + 0.02);
@@ -142,6 +149,15 @@ function playTone(freq, duration=0.12, type='sine', gain=0.12){
 }
 
 function playSound(kind){
+  // if user provided audio files (assets/sounds/*), prefer those
+  if(useFiles && audioFiles[kind]){
+    try{
+      const a = audioFiles[kind].cloneNode();
+      a.volume = muted ? 0 : masterVolume;
+      a.play().catch(()=>{});
+      return;
+    }catch(e){ /* fall back to tones */ }
+  }
   switch(kind){
     case 'collect': playTone(880,0.12,'sine',0.14); break;
     case 'miss': playTone(220,0.18,'sawtooth',0.08); break;
@@ -150,6 +166,41 @@ function playSound(kind){
     case 'milestone': playTone(990,0.14,'sine',0.12); break;
     default: playTone(660,0.08,'sine',0.06);
   }
+}
+
+function maybeLoadAudioFiles(){
+  if(useFiles) return;
+  const names = ['collect','miss','click','win','milestone'];
+  let foundAny = false;
+  for(const n of names){
+    // try common extensions
+    const paths = [`assets/sounds/${n}.mp3`, `assets/sounds/${n}.wav`, `assets/sounds/${n}.ogg`];
+    for(const p of paths){
+      const a = new Audio(p);
+      a.preload = 'auto';
+      // attach error handler to detect missing files
+      a.addEventListener('error', ()=>{});
+      // quick test: do not rely on load events here; assume presence and let play() fail if missing
+      audioFiles[n] = a;
+      foundAny = true;
+      break;
+    }
+  }
+  if(foundAny) useFiles = true;
+}
+
+function setMasterVolume(v){
+  masterVolume = Math.min(1, Math.max(0, Number(v)));
+  localStorage.setItem('cwb_volume', masterVolume.toString());
+}
+
+function setMuted(val){
+  muted = !!val;
+  localStorage.setItem('cwb_muted', muted ? '1' : '0');
+  // update audio elements volume if present
+  Object.values(audioFiles).forEach(a=>{ try{ a.volume = muted?0:masterVolume; }catch(e){} });
+  const muteBtn = document.getElementById('muteBtn');
+  if(muteBtn) muteBtn.textContent = muted ? '🔇' : '🔊';
 }
 
 function endGame(win){
@@ -192,6 +243,25 @@ playAgainBtn.addEventListener('click', ()=>{ overlay.classList.add('hidden'); st
 document.querySelectorAll('.controls button, .controls select, .overlay button').forEach(el=>{
   el.addEventListener('click', ()=> playSound('click'));
 });
+
+// Initialize audio controls from localStorage and hook events
+const volumeSlider = document.getElementById('volumeSlider');
+const muteBtn = document.getElementById('muteBtn');
+if(volumeSlider){
+  const saved = localStorage.getItem('cwb_volume');
+  if(saved !== null) { masterVolume = Number(saved); volumeSlider.value = masterVolume; }
+  volumeSlider.addEventListener('input', (e)=>{ setMasterVolume(e.target.value); });
+}
+if(muteBtn){
+  const savedM = localStorage.getItem('cwb_muted');
+  muted = savedM === '1';
+  muteBtn.textContent = muted ? '🔇' : '🔊';
+  muteBtn.addEventListener('click', ()=>{ setMuted(!muted); });
+}
+
+// ensure audio elements match initial volume
+maybeLoadAudioFiles();
+setMuted(muted);
 
 // Accessibility: allow clicking empty space to remove stray drops (no effect)
 gameArea.addEventListener('click', ()=>{});

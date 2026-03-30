@@ -13,6 +13,10 @@ html,body{height:100%;margin:0;font-family:var(--font);background:linear-gradien
 .brand p{margin:2px 0 0;font-size:0.9rem;color:var(--muted)}
 .controls{display:flex;gap:10px;align-items:center}
 .controls select,.controls button{padding:8px 10px;border-radius:8px;border:1px solid rgba(15,23,42,0.08);background:var(--surface);cursor:pointer}
+
+.audio-controls{display:flex;align-items:center;gap:8px;margin-left:6px}
+.audio-controls button{padding:6px 8px;border-radius:8px;border:1px solid rgba(15,23,42,0.06);background:transparent}
+.audio-controls input[type="range"]{width:96px}
 .statusbar{display:flex;justify-content:space-between;padding:12px 24px;background:transparent;border-bottom:1px solid rgba(15,23,42,0.03);color:var(--muted)}
 .game-area{position:relative;margin:18px auto;max-width:980px;height:60vh;background:linear-gradient(180deg,#dff4ff 0%,#eafaff 60%);border-radius:12px;overflow:hidden;border:1px solid rgba(15,23,42,0.04);box-shadow:0 8px 24px rgba(2,6,23,0.04)}
 .drop{position:absolute;top:-80px;width:36px;height:48px;background:radial-gradient(circle at 35% 30%, #bdf0ff 0%, #00a3e0 60%);border-radius:50% 50% 45% 45%;box-shadow:inset -6px -6px 12px rgba(255,255,255,0.25),0 6px 12px rgba(2,6,23,0.12);cursor:pointer;transform-origin:top center;display:flex;align-items:flex-end;justify-content:center}

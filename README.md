@@ -30,3 +30,18 @@ Sound & Milestones
 - Milestone messages appear during play (e.g. "Halfway there!") when you reach key score thresholds.
 
 If you prefer to use real audio clips, place them in an `assets/sounds/` folder and modify `playSound()` in `script.js` to load/play those files.
+
+Using real audio files
+
+- If you want custom sounds instead of synthesized tones, add audio files under `assets/sounds/` with these exact filenames (one of these extensions):
+	- `collect.mp3` / `collect.wav` / `collect.ogg`
+	- `miss.mp3` / `miss.wav` / `miss.ogg`
+	- `click.mp3` / `click.wav` / `click.ogg`
+	- `win.mp3` / `win.wav` / `win.ogg`
+	- `milestone.mp3` / `milestone.wav` / `milestone.ogg`
+
+- The game will try to use those files automatically if present in `assets/sounds/`.
+
+Volume control
+
+- Use the speaker icon and slider in the header to mute or adjust volume. The value is saved in your browser so your choice persists across sessions.
