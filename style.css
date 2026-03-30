@@ -28,4 +28,9 @@ html,body{height:100%;margin:0;font-family:var(--font);background:linear-gradien
 .donate-btn{display:inline-flex;align-items:center}
 .site-footer{padding:14px 24px;text-align:center;color:var(--muted);font-size:0.9rem}
 
+.milestone{
+  position:absolute;left:50%;top:12%;transform:translateX(-50%);background:rgba(0,163,224,0.95);color:white;padding:10px 14px;border-radius:20px;font-weight:600;box-shadow:0 8px 20px rgba(2,6,23,0.18);opacity:0;transition:opacity .2s,transform .25s}
+.milestone.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+
 @media (max-width:640px){.controls{flex-direction:column;align-items:flex-start}.game-area{height:54vh;margin:12px}}

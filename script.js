@@ -21,6 +21,9 @@ let clockTimer = null;
 let score = 0;
 let timeLeft = 0;
 let currentSettings = null;
+let audioCtx = null;
+let milestones = [];
+let milestoneTriggered = new Set();
 
 function startGame(){
   resetGame(true);
@@ -29,6 +32,16 @@ function startGame(){
   goalEl.textContent = currentSettings.goal;
   timeLeft = currentSettings.timeLimit;
   timerEl.textContent = timeLeft;
+
+  // prepare milestones (halfway, three-quarters, near-goal)
+  milestoneTriggered.clear();
+  milestones = [];
+  const half = Math.ceil(currentSettings.goal/2);
+  const threeQ = Math.ceil(currentSettings.goal*0.75);
+  const almost = Math.max(currentSettings.goal-3, 1);
+  milestones.push({score: half, message: 'Halfway there!'});
+  if(threeQ !== half) milestones.push({score: threeQ, message: 'Great progress!'});
+  if(almost !== threeQ && almost !== half) milestones.push({score: almost, message: 'Almost there!'});
 
   spawnTimer = setInterval(spawnDrop, currentSettings.spawnInterval);
   clockTimer = setInterval(()=>{
@@ -60,6 +73,12 @@ function spawnDrop(){
 
   // Remove when it finishes falling
   drop.addEventListener('animationend', ()=>{
+    // if not collected, it's a miss
+    if(drop.dataset.collected !== 'true'){
+      playSound('miss');
+      // small visual feedback: briefly flash red border
+      gameArea.animate([{boxShadow:'0 8px 24px rgba(255,100,100,0.0)'},{boxShadow:'0 8px 24px rgba(255,100,100,0.14)'}],{duration:180,iterations:1});
+    }
     if(gameArea.contains(drop)) drop.remove();
   });
 
@@ -69,12 +88,67 @@ function spawnDrop(){
 function collectDrop(drop){
   score += 1;
   scoreEl.textContent = score;
+  drop.dataset.collected = 'true';
+  playSound('collect');
   drop.classList.add('pop');
   // remove after pop animation
   setTimeout(()=>{ if(drop.parentNode) drop.remove(); }, 350);
   // optional: small visual feedback on goal
   if(score >= currentSettings.goal){
+    playSound('win');
     endGame(true);
+  }
+  // check milestones
+  checkMilestones(score);
+}
+
+function checkMilestones(currentScore){
+  for(const m of milestones){
+    if(currentScore >= m.score && !milestoneTriggered.has(m.score)){
+      milestoneTriggered.add(m.score);
+      showMilestone(m.message);
+      playSound('milestone');
+    }
+  }
+}
+
+function showMilestone(text){
+  const el = document.createElement('div');
+  el.className = 'milestone';
+  el.textContent = text;
+  gameArea.appendChild(el);
+  // force reflow then show
+  requestAnimationFrame(()=> el.classList.add('show'));
+  setTimeout(()=>{ el.classList.remove('show'); setTimeout(()=> el.remove(),300); }, 1800);
+}
+
+// --- Sound utilities (WebAudio synthesized tones) ---
+function ensureAudio(){
+  if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+}
+
+function playTone(freq, duration=0.12, type='sine', gain=0.12){
+  try{
+    ensureAudio();
+    const t = audioCtx.currentTime;
+    const o = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    o.type = type; o.frequency.setValueAtTime(freq, t);
+    g.gain.setValueAtTime(gain, t);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + duration);
+    o.connect(g); g.connect(audioCtx.destination);
+    o.start(t); o.stop(t + duration + 0.02);
+  }catch(e){ /* silent degrade */ }
+}
+
+function playSound(kind){
+  switch(kind){
+    case 'collect': playTone(880,0.12,'sine',0.14); break;
+    case 'miss': playTone(220,0.18,'sawtooth',0.08); break;
+    case 'click': playTone(1320,0.06,'sine',0.06); break;
+    case 'win': playTone(1320,0.2,'triangle',0.16); setTimeout(()=>playTone(1040,0.16,'sine',0.14), 140); break;
+    case 'milestone': playTone(990,0.14,'sine',0.12); break;
+    default: playTone(660,0.08,'sine',0.06);
   }
 }
 
@@ -109,9 +183,15 @@ function resetGame(skipUiReset=false){
 
 startBtn.addEventListener('click', ()=>{
   if(!spawnTimer) startGame();
+  playSound('click');
 });
 resetBtn.addEventListener('click', ()=>{ resetGame(false); });
 playAgainBtn.addEventListener('click', ()=>{ overlay.classList.add('hidden'); startGame(); });
+
+// play click sound for header buttons
+document.querySelectorAll('.controls button, .controls select, .overlay button').forEach(el=>{
+  el.addEventListener('click', ()=> playSound('click'));
+});
 
 // Accessibility: allow clicking empty space to remove stray drops (no effect)
 gameArea.addEventListener('click', ()=>{});

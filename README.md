@@ -23,3 +23,10 @@ Notes
 
 - The footer includes direct links to charity: water's site and donation page.
 - The UI uses the Poppins web font for a clean, friendly look that pairs well with charity: water branding.
+
+Sound & Milestones
+
+- The game uses lightweight synthesized sounds (WebAudio) for: collect, miss, button click, milestones, and win.
+- Milestone messages appear during play (e.g. "Halfway there!") when you reach key score thresholds.
+
+If you prefer to use real audio clips, place them in an `assets/sounds/` folder and modify `playSound()` in `script.js` to load/play those files.
