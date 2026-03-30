@@ -1,0 +1,31 @@
+:root{
+  --bg:#f6fbff;
+  --accent:#00a3e0;
+  --muted:#6b7280;
+  --surface:#ffffff;
+  --danger:#ff6b6b;
+  --font: 'Poppins', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;font-family:var(--font);background:linear-gradient(180deg,#eaf6ff 0%,var(--bg) 100%);color:#0f172a}
+.site-header{display:flex;justify-content:space-between;align-items:center;padding:18px 24px;border-bottom:1px solid rgba(15,23,42,0.06);}
+.brand h1{margin:0;font-size:1.25rem;color:var(--accent)}
+.brand p{margin:2px 0 0;font-size:0.9rem;color:var(--muted)}
+.controls{display:flex;gap:10px;align-items:center}
+.controls select,.controls button{padding:8px 10px;border-radius:8px;border:1px solid rgba(15,23,42,0.08);background:var(--surface);cursor:pointer}
+.statusbar{display:flex;justify-content:space-between;padding:12px 24px;background:transparent;border-bottom:1px solid rgba(15,23,42,0.03);color:var(--muted)}
+.game-area{position:relative;margin:18px auto;max-width:980px;height:60vh;background:linear-gradient(180deg,#dff4ff 0%,#eafaff 60%);border-radius:12px;overflow:hidden;border:1px solid rgba(15,23,42,0.04);box-shadow:0 8px 24px rgba(2,6,23,0.04)}
+.drop{position:absolute;top:-80px;width:36px;height:48px;background:radial-gradient(circle at 35% 30%, #bdf0ff 0%, #00a3e0 60%);border-radius:50% 50% 45% 45%;box-shadow:inset -6px -6px 12px rgba(255,255,255,0.25),0 6px 12px rgba(2,6,23,0.12);cursor:pointer;transform-origin:top center;display:flex;align-items:flex-end;justify-content:center}
+.drop:active{transform:scale(0.95)}
+.drop.pop{animation:pop .35s ease forwards}
+@keyframes pop{to{transform:scale(1.6);opacity:0}} 
+@keyframes fall{to{transform:translateY(100vh);opacity:0.9}}
+.overlay{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(3,7,18,0.45)}
+.overlay.hidden{display:none}
+.overlay-box{background:var(--surface);padding:22px;border-radius:10px;box-shadow:0 12px 40px rgba(2,6,23,0.3);max-width:520px;text-align:center}
+.overlay-actions{display:flex;gap:12px;justify-content:center;margin-top:12px}
+.overlay button,.donate-btn{padding:10px 14px;border-radius:8px;border:none;background:var(--accent);color:white;text-decoration:none}
+.donate-btn{display:inline-flex;align-items:center}
+.site-footer{padding:14px 24px;text-align:center;color:var(--muted);font-size:0.9rem}
+
+@media (max-width:640px){.controls{flex-direction:column;align-items:flex-start}.game-area{height:54vh;margin:12px}}

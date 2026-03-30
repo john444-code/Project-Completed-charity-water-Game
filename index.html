@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Water Drop Collector — charity: water</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="brand">
+        <h1>Water Drop Collector</h1>
+        <p>Collect drops to bring clean water — play for charity: water</p>
+      </div>
+      <div class="controls">
+        <label for="difficulty">Difficulty</label>
+        <select id="difficulty">
+          <option value="easy">Easy</option>
+          <option value="normal" selected>Normal</option>
+          <option value="hard">Hard</option>
+        </select>
+        <button id="startBtn">Start</button>
+        <button id="resetBtn">Reset</button>
+      </div>
+    </header>
+
+    <section class="statusbar">
+      <div>Score: <span id="score">0</span> / <span id="goal">0</span></div>
+      <div>Time: <span id="timer">0</span>s</div>
+    </section>
+
+    <main>
+      <div id="gameArea" class="game-area" aria-live="polite"></div>
+      <div id="overlay" class="overlay hidden">
+        <div class="overlay-box">
+          <h2 id="resultTitle"></h2>
+          <p id="resultText"></p>
+          <div class="overlay-actions">
+            <button id="playAgain">Play Again</button>
+            <a class="donate-btn" href="https://www.charitywater.org/donate" target="_blank" rel="noopener">Donate to charity: water</a>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer class="site-footer">
+      <p>Learn more about the mission at <a href="https://www.charitywater.org" target="_blank" rel="noopener">charity: water</a>.</p>
+    </footer>
+
+    <script src="script.js"></script>
+  </body>
+</html>
