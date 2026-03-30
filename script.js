@@ -132,6 +132,10 @@ function showMilestone(text){
 // --- Sound utilities (WebAudio synthesized tones) ---
 function ensureAudio(){
   if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  // Resume if the context is suspended (browsers block audio until user gesture)
+  if(audioCtx.state === 'suspended'){
+    audioCtx.resume().catch(()=>{});
+  }
 }
 
 function playTone(freq, duration=0.12, type='sine', gain=0.12){
